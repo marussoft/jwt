@@ -9,8 +9,13 @@ use Marussia\Jwt\Exception\BadTokenException as BadTokenException;
 class Jwt
 {
     // Подпись
-    private const SIGNATURE = a2bb0b658ada1b8c06b58a7a81fa5de6e;
+    private $signature;
 
+    public function __construct(string $signature)
+    {
+        $this->signature = $signature;
+    }
+    
     // Проверяет валидность токена
     private function isValidToken(string $uid) : bool
     {
@@ -26,7 +31,7 @@ class Jwt
         
         $payload = json_decode($segments[1], true);
         
-        $hash = hash('sha512', $header . $payload . static::SIGNATURE);
+        $hash = hash('sha512', $header . $payload . $this->signature);
         
         if ($hash === $segments[2]) {
             return true;
@@ -42,7 +47,7 @@ class Jwt
         
         $payload = json_encode($data, JSON_UNESCAPED_UNICODE);
         
-        $hash = hash('sha512', $header . $payload . static::SIGNATURE);
+        $hash = hash('sha512', $header . $payload . $this->signature);
         
         return base64_encode($header . '.' . $payload . '.' . $hash);
     }
