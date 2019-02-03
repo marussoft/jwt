@@ -10,7 +10,7 @@ use Marussia\Jwt\JwtInterface as JwtInterface;
 class Jwt implements JwtInterface
 {
     // Подпись
-    private $signature;
+    private $key;
 
     public function __construct(string $key)
     {
