@@ -12,7 +12,7 @@ class Jwt implements JwtInterface
     // Подпись
     private $key;
     
-    private $payload;
+    private $segments;
     
     private $jwt;
 
@@ -27,7 +27,7 @@ class Jwt implements JwtInterface
     }
     
     // Проверяет валидность токена
-    private function isValidToken() : bool
+    public function isValidToken() : bool
     {
         $token = base64_decode($this->jwt);
         
@@ -35,15 +35,11 @@ class Jwt implements JwtInterface
             throw new BadTokenException($token);
         }
         
-        $segments explode('.', $token);
+        $this->segments = explode('.', $token);
 
-        $header = json_decode($segments[0], true);
+        $signature = hash('sha512', $this->segments[0] . $this->segments[1] . $this->key);
         
-        $this->payload = json_decode($segments[1], true);
-        
-        $signature = hash('sha512', $header . $this->payload . $this->key);
-        
-        if ($signature === $segments[2]) {
+        if ($signature === $this->segments[2]) {
             return true;
         }
         
@@ -52,7 +48,12 @@ class Jwt implements JwtInterface
     
     public function getPayload()
     {
-        return $this->payload;
+        return json_decode($this->segments[1], true);
+    }
+    
+    public function getHeader()
+    {
+        return json_decode($this->segments[0], true);
     }
     
     // Возвращает новый токен
