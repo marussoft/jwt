@@ -1,0 +1,27 @@
+{
+    "name": "marussia/jwt",
+    "type": "library",
+    "description": "Simple PHP-JWT",
+    "license": "MIT",
+    "keywords": [
+        "jwt"
+    ],
+    "authors": [
+        {
+            "name": "Mikhail Ilinsky",
+            "email": "mail@milinsky.ru"
+        }
+    ],
+    "support": {
+        "docs": "https://docs.marussia.org/jwt/"
+    },
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Marussia\\Jwt\\": "src/"
+        }
+    }
+} 
