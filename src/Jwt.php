@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace Marussia\Jwt;
 
 use Marussia\Jwt\Exception\BadTokenException as BadTokenException;
+use Marussia\Jwt\JwtInterface as JwtInterface;
 
-class Jwt
+class Jwt implements JwtInterface
 {
     // Подпись
     private $signature;
 
-    public function __construct(string $signature)
+    public function __construct(string $key)
     {
-        $this->signature = $signature;
+        $this->key = $key;
     }
     
     // Проверяет валидность токена
-    private function isValidToken(string $uid) : bool
+    private function isValidToken(string $jwt) : bool
     {
-        $token = base64_decode($uid);
+        $token = base64_decode($jwt);
         
         if ($token === false) {
             throw new BadTokenException($token);
@@ -31,9 +32,9 @@ class Jwt
         
         $payload = json_decode($segments[1], true);
         
-        $hash = hash('sha512', $header . $payload . $this->signature);
+        $signature = hash('sha512', $header . $payload . $this->key);
         
-        if ($hash === $segments[2]) {
+        if ($signature === $segments[2]) {
             return true;
         }
         
@@ -47,28 +48,9 @@ class Jwt
         
         $payload = json_encode($data, JSON_UNESCAPED_UNICODE);
         
-        $hash = hash('sha512', $header . $payload . $this->signature);
+        $signature = hash('sha512', $header . $payload . $this->key);
         
-        return base64_encode($header . '.' . $payload . '.' . $hash);
+        return base64_encode($header . '.' . $payload . '.' . $signature);
     }
-    
-    public function checkExpireToken(string $uid) : bool
-    {
-    
-    }
-    
-    public function checkRefreshToken(string $ref_token) : bool
-    {
-    
-    }
-    
-    public function checkExpireRefreshToken(string $ref_token) : bool
-    {
-    
-    }
-    
-    public function getRefreshToken() : string
-    {
-    
-    }
+
 }
