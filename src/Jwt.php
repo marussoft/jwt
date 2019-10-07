@@ -4,56 +4,40 @@ declare(strict_types=1);
 
 namespace Marussia\Jwt;
 
-use Marussia\Jwt\Exception\BadTokenException as BadTokenException;
-use Marussia\Jwt\JwtInterface as JwtInterface;
+use Marussia\Jwt\Exceptions\BadTokenException;
 
-class Jwt implements JwtInterface
+class Jwt
 {
     // Подпись
     private $key;
-    
-    private $segments;
-    
-    private $jwt;
 
     public function __construct(string $key)
     {
         $this->key = $key;
     }
     
-    public function setJwt(string $jwt)
-    {
-        $this->jwt = $jwt;
-    }
-    
     // Проверяет валидность токена
-    public function isValidToken() : bool
+    public function isValidToken(string $jwt) : bool
     {
-        $token = base64_decode($this->jwt);
-        
-        if ($token === false) {
-            throw new BadTokenException($token);
-        }
-        
-        $this->segments = explode('.', $token);
+        $segments = $this->parse($jwt)
 
-        $signature = hash('sha512', $this->segments[0] . $this->segments[1] . $this->key);
+        $signature = hash('sha512', $segments[0] . $segments[1] . $this->key);
         
-        if ($signature === $this->segments[2]) {
-            return true;
-        }
-        
-        return false;
+        return hash_equals($signature, $segments[2]);
     }
     
-    public function getPayload()
+    public function getPayload(string $jwt)
     {
-        return json_decode($this->segments[1], true);
+        $segments = $this->parse($jwt)
+    
+        return json_decode($segments[1], true);
     }
     
-    public function getHeader()
+    public function getHeader(string $jwt) : array
     {
-        return json_decode($this->segments[0], true);
+        $segments = $this->parse($jwt);
+        
+        return json_decode($segments[0], true);
     }
     
     // Возвращает новый токен
@@ -68,4 +52,14 @@ class Jwt implements JwtInterface
         return base64_encode($header . '.' . $payload . '.' . $signature);
     }
 
+    private function parse(string $jwt) : array
+    {
+        $token = base64_decode($jwt);
+        
+        if ($token === false) {
+            throw new BadTokenException($token);
+        }
+        
+        return explode('.', $token);
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Marussia\Jwt\Exception;
+namespace Marussia\Jwt\Exceptions;
 
 class BadTokenException extends \Exception
 {
