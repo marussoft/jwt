@@ -19,7 +19,7 @@ class Jwt
     // Проверяет валидность токена
     public function isValidToken(string $jwt) : bool
     {
-        $segments = $this->parse($jwt)
+        $segments = $this->parse($jwt);
 
         $signature = hash('sha512', $segments[0] . $segments[1] . $this->key);
         
@@ -28,7 +28,7 @@ class Jwt
     
     public function getPayload(string $jwt)
     {
-        $segments = $this->parse($jwt)
+        $segments = $this->parse($jwt);
     
         return json_decode($segments[1], true);
     }
