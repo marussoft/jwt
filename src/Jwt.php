@@ -54,12 +54,12 @@ class Jwt
 
     private function parse(string $jwt) : array
     {
-        $token = base64_decode($jwt);
+        $token = base64_decode($jwt, true);
         
         if ($token === false) {
             throw new BadTokenException($token);
         }
-        
+
         return explode('.', $token);
     }
 }
